@@ -1,6 +1,10 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:l="/lib/layout">
 	<f:entry title="${%Branch Name}" field="branchName">
 		<f:textbox value="${instance.branchName}" default="master"/>
+	</f:entry>
+	<f:entry title="${%Match against Pull Request origin}" field="pullRequestMatchOriginName">
+		<f:checkbox checked="${instance.pullRequestMatchOrigin}"/>
 	</f:entry>
 	<f:entry title="${%Priority}" field="priority">
 		<f:textbox value="${instance.priority}" default="3"/>

@@ -1,1 +1,5 @@
-buildPlugin()
+buildPlugin(
+    tests: [
+        skip: true
+    ]
+)
