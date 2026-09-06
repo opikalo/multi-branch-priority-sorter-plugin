@@ -3,3 +3,4 @@ work
 target
 *.iml
 script/env.sh
+.direnv

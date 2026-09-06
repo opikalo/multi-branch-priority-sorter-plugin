@@ -24,12 +24,14 @@ public class BranchPriorityStrategy extends AbstractDynamicPriorityStrategy {
 
     private String branchName;
     private Boolean pullRequestMatchOriginName;
+    private Boolean pullRequestMatchTargetName;
     private int priority;
 
     @DataBoundConstructor
-    public BranchPriorityStrategy(String branchName, Boolean pullRequestMatchOriginName, int priority) {
+    public BranchPriorityStrategy(String branchName, Boolean pullRequestMatchOriginName, Boolean pullRequestMatchTargetName, int priority) {
         this.branchName = branchName;
         this.pullRequestMatchOriginName = pullRequestMatchOriginName;
+        this.pullRequestMatchTargetName = pullRequestMatchTargetName;
         this.priority = priority;
     }
 
@@ -40,13 +42,25 @@ public class BranchPriorityStrategy extends AbstractDynamicPriorityStrategy {
             BranchJobProperty branchProperty = job.getProperty(BranchJobProperty.class);
             if (branchProperty != null) {
                 Branch branch = branchProperty.getBranch();
-                String originName = branch.getName();
+                String branchOriginName = branch.getName();
+                String prOriginName = null;
+                String matchedName = branchOriginName;
                 if (Boolean.TRUE.equals(pullRequestMatchOriginName) && branch.getHead() instanceof ChangeRequestSCMHead2) {
-                    originName = ((ChangeRequestSCMHead2) branch.getHead()).getOriginName();
+                    prOriginName = ((ChangeRequestSCMHead2) branch.getHead()).getOriginName();
+                    matchedName = prOriginName;
+                    LOGGER.info("BranchPriorityStrategy: branch name = '" + branchOriginName + "', PR origin name = '" + prOriginName + "', matching against PR origin name, pattern = '" + branchName + "'");
+                } else if (Boolean.TRUE.equals(pullRequestMatchTargetName) && branch.getHead() instanceof ChangeRequestSCMHead2) {
+                    String prTargetName = ((ChangeRequestSCMHead2) branch.getHead()).getTarget().getName();
+                    matchedName = prTargetName;
+                    LOGGER.info("BranchPriorityStrategy: branch name = '" + branchOriginName + "', PR target name = '" + prTargetName + "', matching against PR target name, pattern = '" + branchName + "'");
+                } else {
+                    LOGGER.info("BranchPriorityStrategy: branch name = '" + branchOriginName + "', matching against branch name, pattern = '" + branchName + "'");
                 }
-                LOGGER.warning("BranchPriorityStrategy: branch name seen = '" + originName + "', pattern = '" + branchName + "'");
-                if (originName.matches(branchName)) {
+                if (matchedName.matches(branchName)) {
+                    LOGGER.info("BranchPriorityStrategy: matched '" + matchedName + "' against pattern '" + branchName + "', returning priority " + priority);
                     return priority;
+                } else {
+                    LOGGER.info("BranchPriorityStrategy: no match for '" + matchedName + "' against pattern '" + branchName + "', no priority assigned");
                 }
             }
         }
@@ -71,6 +85,10 @@ public class BranchPriorityStrategy extends AbstractDynamicPriorityStrategy {
 
     public Boolean getPullRequestMatchOriginName() {
         return pullRequestMatchOriginName;
+    }
+
+    public Boolean getPullRequestMatchTargetName() {
+        return pullRequestMatchTargetName;
     }
 
     public int getPriority() {

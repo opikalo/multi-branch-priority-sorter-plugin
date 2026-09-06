@@ -6,6 +6,9 @@
 	<f:entry title="${%Match against Pull Request origin}" field="pullRequestMatchOriginName">
 		<f:checkbox checked="${instance.pullRequestMatchOrigin}"/>
 	</f:entry>
+	<f:entry title="${%Match against Pull Request Target Branch}" field="pullRequestMatchTargetName">
+		<f:checkbox checked="${instance.pullRequestMatchTargetName}"/>
+	</f:entry>
 	<f:entry title="${%Priority}" field="priority">
 		<f:textbox value="${instance.priority}" default="3"/>
 	</f:entry>
